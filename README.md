@@ -1,19 +1,16 @@
 
 # Introduction 
 
-This is the README for special topics class ROB-GY 7863 / CSCI-GA 3033 7863: Planning, Learning, and Control for Space Robotics. We will use this repository for simulations. 
+This is the README for NYU's special topics class ROB-GY 7863 / CSCI-GA 3033 7863: Planning, Learning, and Control for Space Robotics. 
+The course is taught by Benjamin Riviere, bpr3966@nyu.edu. 
+The course assistant is Rika Valluri, srv297@nyu.edu. 
+We will use this repository as a supplemental material for lectures. 
 
-<!-- ![My Image](./images/nyu.png "NYU")
-![My Image](./images/rrl.png "Riviere Robot Lab (RRL)")
- -->
-
-<img src="./images/nyu.png" alt="NYU" width="50%">
-<img src="./images/rrl.png" alt="Riviere Robot Lab (RRL)" width="50%">
+<img src="./images/nyu.png" alt="NYU" width="40%">
 
 # System Requirements 
 - python 3.8+
 - anaconda or miniconda 
-
 
 # Getting started 
 - create new conda environment 
@@ -25,12 +22,9 @@ conda activate space-robotics
 ```bash
 pip install -r requirements.txt
 ```
-- run setup script 
-```bash
-python setup.py install
-```
 
 # Example
 ```bash
-python lecture1/spacecraft_sim.py
+cd lecture1
+python spacecraft_sim.py
 ```
