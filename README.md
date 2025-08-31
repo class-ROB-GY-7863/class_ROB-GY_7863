@@ -3,10 +3,12 @@
 
 This is the README for special topics class ROB-GY 7863 / CSCI-GA 3033 7863: Planning, Learning, and Control for Space Robotics. We will use this repository for simulations. 
 
-
-![My Image](./images/nyu.png "NYU")
+<!-- ![My Image](./images/nyu.png "NYU")
 ![My Image](./images/rrl.png "Riviere Robot Lab (RRL)")
+ -->
 
+<img src="./images/nyu.png" alt="NYU" width="50%">
+<img src="./images/rrl.png" alt="Riviere Robot Lab (RRL)" width="50%">
 
 # System Requirements 
 - python 3.8+
