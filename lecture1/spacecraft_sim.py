@@ -165,5 +165,5 @@ def plot_body_frame(ax, position, phi, theta, psi, scale=1.0):
 
 
 if __name__ == '__main__':
-    simulate("./spacecraft_sim.h5")
+    # simulate("./spacecraft_sim.h5")
     render("./spacecraft_sim.h5")

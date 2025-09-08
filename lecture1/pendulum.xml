@@ -1,0 +1,31 @@
+<mujoco model="pendulum">
+
+  <compiler angle="radian" inertiafromgeom="true"/>
+  <option timestep="0.001" gravity="0 0 -9.81" integrator="RK4"/>
+
+  <default>
+    <joint damping="0.00001" armature="0" limited="false"/>
+    <geom type="capsule" size="0.05" rgba="0.3 0.6 0.9 1"/>
+    <motor ctrlrange="-5 5" gear="1"/>
+  </default>
+
+  <worldbody>
+    <light pos="2 2 3" dir="-1 -1 -2"/>
+    <body name="pendulum" pos="0 0 0">
+      <joint name="hinge" type="hinge" axis="0 1 0"/>
+      <geom name="link" type="capsule" fromto="0 0 0  0 0 -1" mass="1.0"/>
+      <site name="tip" pos="0 0 -1" size="0.02" rgba="1 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="torque" joint="hinge"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="theta" joint="hinge"/>
+    <jointvel name="thetadot" joint="hinge"/>
+    <actuatorfrc name="tau" actuator="torque"/>
+  </sensor>
+
+</mujoco>
