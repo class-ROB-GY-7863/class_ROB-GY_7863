@@ -1,0 +1,44 @@
+<mujoco model="simple_pendulum_point_mass">
+  <!-- Units: SI. Angle in radians. Gravity along -Z. -->
+  <compiler angle="radian" inertiafromgeom="true"/>
+  <option gravity="0 0 -9.81" integrator="RK4" timestep="0.001"/>
+
+  <!-- Choose parameters here -->
+  <default>
+    <joint type="hinge" axis="0 1 0" limited="false" damping="0"/>
+    <!-- Visual rod: essentially massless (tiny mass). Adjust size / fromto to set length ℓ -->
+    <geom type="capsule" size="0.01" rgba="0.3 0.6 0.9 1" contype="0" conaffinity="0"/>
+    <motor gear="1" ctrlrange="-10 10"/>  <!-- u (N·m) -->
+  </default>
+
+  <worldbody>
+    <light pos="2 2 3" dir="-1 -1 -2"/>
+
+    <!-- Pendulum of length ℓ = 1.0 m, mass m = 1.0 kg at the tip -->
+    <body name="pendulum" pos="0 0 0">
+      <!-- θ about +Y; θ=0 => rod points straight down (-Z) -->
+      <joint name="hinge"/>
+
+      <!-- massless (visual) rod from pivot to tip -->
+      <geom name="rod" fromto="0 0 0   0 0 -1.0" mass="1e-6"/>
+
+      <!-- point mass at tip (use tiny radius so inertia ≈ mℓ^2) -->
+      <geom name="bob" type="sphere" pos="0 0 -1.0" size="0.02" mass="1.0"/>
+
+      <!-- a marker at the tip -->
+      <site name="tip" pos="0 0 -1.0" size="0.02" rgba="1 0.3 0.3 1"/>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <!-- Torque input u applied about +Y -->
+    <motor name="u" joint="hinge"/>
+  </actuator>
+
+  <sensor>
+    <jointpos   name="theta"    joint="hinge"/>
+    <jointvel   name="thetadot" joint="hinge"/>
+    <actuatorfrc name="tau"     actuator="u"/>
+  </sensor>
+</mujoco>
+
