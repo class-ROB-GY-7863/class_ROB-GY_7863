@@ -75,14 +75,15 @@ def dxdt(x, u, param):
 
     # dynamics 
     _dxdt[0:3] = v 
-    _dxdt[3:6] = np.linalg.pinv(B(Theta)) @ omega 
+    # _dxdt[3:6] = np.linalg.pinv(B(Theta)) @ omega 
+    _dxdt[3:6] = B_inv(Theta) @ omega 
     _dxdt[6:9] = f_g + f_ext 
     _dxdt[9:12] = np.linalg.pinv(param["inertia"]) @ (- np.cross(omega, param["inertia"] @ omega) + tau_ext)
 
     return _dxdt
 
 
-def B(Theta):
+def B_inv(Theta):
     phi, theta, psi = Theta[0], Theta[1], Theta[2]
     return np.array([
         [1, np.sin(phi) * np.tan(theta), np.cos(phi) * np.tan(theta)],
@@ -165,5 +166,5 @@ def plot_body_frame(ax, position, phi, theta, psi, scale=1.0):
 
 
 if __name__ == '__main__':
-    # simulate("./spacecraft_sim.h5")
+    simulate("./spacecraft_sim.h5")
     render("./spacecraft_sim.h5")
