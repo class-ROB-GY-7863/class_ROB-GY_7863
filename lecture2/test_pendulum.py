@@ -8,6 +8,10 @@ import os
 import time 
 
 
+plt.rcParams['font.size'] = 24 
+plt.rcParams['lines.linewidth'] = 4
+
+
 def el_pendulum_dynamics(x, u):
     theta, theta_dot = x
     torque = u[0]
