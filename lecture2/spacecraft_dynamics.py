@@ -86,13 +86,6 @@ def dxdt_lagrange(x, u, param):
     dxdt[9:12] = ddth
     return dxdt
 
-def dxdt_mujoco(x, u, param, model, data):
-	# for free body joint 
-    # qpos: (x,y,z)_world, qw, qx, qy, qz 
-    # qvel: (omega_x,omega_y,omega_z)_world, (vx, vy, vz)_world
-    # u_mujoco: (fx,fy,fz)_world, (tau_x,tau_y,tau_z)_world 
-    pass 
-
 
 def force_gravity_world(r_world, param):
     """Central gravity force (N) on the spacecraft at world position r_world."""
@@ -103,6 +96,10 @@ def force_gravity_world(r_world, param):
         return np.zeros(3)
     a_g = - mu * r_rel / (R**3)                             # m/s^2
     return param["mass"] * a_g                              # N
+
+
+def skew_matrix_to_vector(mat):
+    return np.array([mat[2,1], mat[0,2], mat[1,0]])
 
 
 # convert angle representations 
@@ -176,11 +173,6 @@ def Binv_zyx(phi, theta):
 
 # state conversions
 def lagrange_to_newton_x(lagrange_x):
-    """
-    Lagrange state (Euler-rate last 3) -> Newton state (body ω last 3).
-      lagrange_x = [r(3), euler(3), v_world(3), [dotφ,dotθ,dotψ]]
-      newton_x   = [r(3), euler(3), v_world(3), omega_body(3)]
-    """
     x = lagrange_x.copy()
     r = x[0:3]
     phi, theta, psi = x[3:6]
@@ -193,11 +185,6 @@ def lagrange_to_newton_x(lagrange_x):
 
 
 def newton_to_lagrange_x(newton_x):
-    """
-    Lagrange state (Euler-rate last 3) -> Newton state (body ω last 3).
-      lagrange_x = [r(3), euler(3), v_world(3), [dotφ,dotθ,dotψ]]
-      newton_x   = [r(3), euler(3), v_world(3), omega_body(3)]
-    """
     x = newton_x.copy()
     r = x[0:3]
     phi, theta, psi = x[3:6]
@@ -235,6 +222,14 @@ def make_nd_scales(param):
     V0 = L0 / T0
     F0 = M0 * L0 / T0**2
     TAU0 = M0 * L0**2 / T0**2
+
+    # mu = 1.0
+    # L0 = 1.0
+    # T0 = 1.0
+    # M0 = 1.0
+    # V0 = 1.0
+    # F0 = 1.0
+    # TAU0 = 1.0
     return dict(L0=L0, T0=T0, M0=M0, V0=V0, F0=F0, TAU0=TAU0)
 
 # ----------------- ND conversions -----------------
@@ -254,7 +249,7 @@ def x_nd_to_phys(xn, nd):
 
 def u_phys_to_nd(u, nd):
     f = u[0:3]/nd["F0"]
-    tau = u[3:6]/nd["TAU0"]
+    tau = u[3:6]*nd["TAU0"]
     return np.concatenate([f,tau])
 
 def inertia_phys_to_nd(I, nd):
