@@ -16,11 +16,11 @@ def dxdt_newton(x, u, param):
     tau_ext = u[3:6]
     # gravity
     r_rel = param["r_earth"] - r
-    f_g = param["G"] * param["mass_earth"] * r_rel / np.power(np.linalg.norm(r_rel), 3)
+    f_g = param["G"] * param["mass_earth"] * param["mass"] * r_rel / np.power(np.linalg.norm(r_rel), 3)
     # dynamics 
     _dxdt[0:3] = v 
     _dxdt[3:6] = Binv_zyx(Theta[0], Theta[1]) @ omega 
-    _dxdt[6:9] = f_g + f_ext / param["mass"]
+    _dxdt[6:9] = (f_g + f_ext) / param["mass"]
     _dxdt[9:12] = np.linalg.pinv(param["inertia"]) @ (- np.cross(omega, param["inertia"] @ omega) + tau_ext)
     return _dxdt
 
@@ -175,47 +175,6 @@ def Binv_zyx(phi, theta):
 
 
 # state conversions
-def newton_to_mujoco_x(newton_x):
-    """
-    Newton state (12) -> MuJoCo freejoint (qpos7, qvel6).
-      newton_x = [r(3), euler(3), v_world(3), omega_body(3)]
-    qpos = [x y z qw qx qy qz]
-    qvel = [ω_world(3) v_world(3)]
-    """
-    r = newton_x[0:3]
-    phi, theta, psi = newton_x[3:6]
-    v_world = newton_x[6:9]
-    omega_body = newton_x[9:12]
-
-    R = R_from_euler_zyx(phi, theta, psi)   # body->world
-    q = quat_from_R(R)                      # (w,x,y,z)
-    omega_world = R @ omega_body
-
-    qpos = np.concatenate([r, q])
-    qvel = np.concatenate([omega_world, v_world])  # MuJoCo order
-    return qpos, qvel
-
-
-def mujoco_to_newton_x(qpos, qvel):
-    """
-    MuJoCo freejoint (qpos7, qvel6) -> your Newton state (12) with body rates.
-      qpos = [x y z qw qx qy qz]
-      qvel = [ω_world(3) v_world(3)]
-    Returns x = [r, euler(3), v_world, omega_body]
-    """
-    r = qpos[0:3]
-    q = qpos[3:7]
-    R = R_from_quat(q) 
-    phi, theta, psi = euler_zyx_from_R(R)
-
-    omega_world = qvel[0:3]
-    v_world = qvel[3:6]
-    omega_body = R.T @ omega_world
-
-    x = np.concatenate([r, [phi, theta, psi], v_world, omega_body])
-    return x
-
-
 def lagrange_to_newton_x(lagrange_x):
     """
     Lagrange state (Euler-rate last 3) -> Newton state (body ω last 3).
@@ -249,16 +208,16 @@ def newton_to_lagrange_x(newton_x):
     return lagrange_x
 
 
-def newton_to_mujoco_x_nd(x_phys, nd):
+def mujoco_nd_from_newton_x(x_phys, nd):
     x_nd = x_phys_to_nd(x_phys, nd)
     r = x_nd[0:3]; phi,theta,psi = x_nd[3:6]; v_nd = x_nd[6:9]; omega_nd_body = x_nd[9:12]
-    R = R_from_euler_zyx(phi, theta, psi); q = quat_from_R(R); omega_nd_world = R @ omega_nd_body
-    return np.concatenate([r,q]), np.concatenate([omega_nd_world, v_nd])
+    R = R_from_euler_zyx(phi, theta, psi); q = quat_from_R(R)
+    return np.concatenate([r,q]), np.concatenate([v_nd, omega_nd_body])
 
 
-def mujoco_to_newton_x_from_nd(qpos_nd, qvel_nd, nd):
+def newton_x_from_mujoco_nd(qpos_nd, qvel_nd, nd):
     r_nd = qpos_nd[0:3]; q = qpos_nd[3:7]; R = R_from_quat(q); phi,theta,psi = euler_zyx_from_R(R)
-    omega_nd_world = qvel_nd[0:3]; v_nd = qvel_nd[3:6]; omega_nd_body = R.T @ omega_nd_world
+    v_nd = qvel_nd[0:3]; omega_nd_body = qvel_nd[3:6]
     x_nd = np.concatenate([r_nd,[phi,theta,psi], v_nd, omega_nd_body])
     return x_nd_to_phys(x_nd, nd)
 
@@ -293,7 +252,7 @@ def x_nd_to_phys(xn, nd):
     omega = xn[9:12]/nd["T0"]
     return np.concatenate([r,[phi,theta,psi], v, omega])
 
-def u_to_nd(u, nd):
+def u_phys_to_nd(u, nd):
     f = u[0:3]/nd["F0"]
     tau = u[3:6]/nd["TAU0"]
     return np.concatenate([f,tau])
@@ -304,5 +263,4 @@ def inertia_phys_to_nd(I, nd):
 # ----------------- ND gravity (force in ND units) -----------------
 def force_gravity_world_nd(r_nd):
     R = np.linalg.norm(r_nd)
-    if R < 1e-12: return np.zeros(3)
     return - r_nd / (R**3)  # since mu~ = 1 and m~ = 1

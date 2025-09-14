@@ -1,50 +1,40 @@
 <mujoco model="spacecraft_nd">
   <compiler angle="radian" inertiafromgeom="false"/>
-  <!-- ND time step; you will overwrite from Python if needed -->
   <option timestep="1e-3" gravity="0 0 0" integrator="implicit"/>
 
   <default>
-    <joint armature="1e-4" damping="1e-4" stiffness="0"/>
+    <joint armature="0.0" damping="0.0" stiffness="0"/>
     <geom contype="0" conaffinity="0" friction="0 0 0" rgba="0.8 0.6 0.4 1"/>
-    <!-- ND control magnitudes are O(1) -->
     <motor ctrllimited="true" ctrlrange="-10 10"/>
   </default>
 
   <worldbody>
     <body name="spacecraft">
       <freejoint name="base6dof"/>
-
-      <!-- NOTE: size values are in ND length units (meters / L0).
-           You can pass L0 from Python and scale these at load time if desired.
-           For a neutral visual, keep them O(1): -->
       <geom type="cylinder" size="0.001 0.0015" rgba="0.5 0.5 0.5 1"/>
-
-      <!-- Inertial parameters in ND units: mass=1, diaginertia = I/(M0 L0^2) -->
-      <inertial pos="0 0 0" mass="1" diaginertia="1 1 1"/>  <!-- PLACEHOLDER: overwritten from Python if you want exact values -->
-
+      <inertial pos="0 0 0" mass="1" diaginertia="1 1 1"/> 
       <site name="com" pos="0 0 0" size="0.01" rgba="1 0 0 1"/>
     </body>
-
-    <!-- Earth visual only; in ND units this would be size = R_earth / L0 (~1).
-         Leave it O(1) to avoid giant visuals: -->
     <body name="earth" pos="0 0 0">
       <geom type="sphere" size="1.0" rgba="0.2 0.5 1 1" contype="0" conaffinity="0" friction="0 0 0" density="0"/>
     </body>
-
     <camera name="fixed_camera" pos="0 0 5" quat="1 0 0 0" fovy="45"/>
     <light name="light1" pos="0 0 5" dir="0 0 -1" diffuse="1 1 1" specular="0.3 0.3 0.3" ambient="0.1 0.1 0.1"/>
   </worldbody>
 
   <actuator>
-    <!-- world linear forces -->
-    <motor name="F_world_x" joint="base6dof" gear="0 0 0 1 0 0"/>
+    <motor name="F_world_x" joint="base6dof" gear="1 0 0 0 0 0"/>
+    <motor name="F_world_y" joint="base6dof" gear="0 1 0 0 0 0"/>
+    <motor name="F_world_z" joint="base6dof" gear="0 0 1 0 0 0"/>
+    <motor name="M_body_x" joint="base6dof" gear="0 0 0 1 0 0"/>
+    <motor name="M_body_y" joint="base6dof" gear="0 0 0 0 1 0"/>
+    <motor name="M_body_z" joint="base6dof" gear="0 0 0 0 0 1"/>
+<!--     <motor name="F_world_x" joint="base6dof" gear="0 0 0 1 0 0"/>
     <motor name="F_world_y" joint="base6dof" gear="0 0 0 0 1 0"/>
     <motor name="F_world_z" joint="base6dof" gear="0 0 0 0 0 1"/>
-
-    <!-- world torques -->
     <motor name="M_world_x" joint="base6dof" gear="1 0 0 0 0 0"/>
     <motor name="M_world_y" joint="base6dof" gear="0 1 0 0 0 0"/>
-    <motor name="M_world_z" joint="base6dof" gear="0 0 1 0 0 0"/>
+    <motor name="M_world_z" joint="base6dof" gear="0 0 1 0 0 0"/> -->
   </actuator>
 
   <sensor>
