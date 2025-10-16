@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn
+import tqdm 
 
 
 def algo_primal_dual(z0, A, b, c, D, g, max_num_iterations, lagrangian_mode="standard"): 
@@ -32,15 +33,15 @@ def algo_primal_dual(z0, A, b, c, D, g, max_num_iterations, lagrangian_mode="sta
 	elif lagrangian_mode == "regularized":
 		# there are better ways to pick these constants
 		gamma = 0.1 
-		eta = 0.1 
+		eta = 10.0
 		_, sigmas, _ = np.linalg.svd(D)
 		sigmasqrd_min = np.min(sigmas) ** 2.0
 		sigmasqrd_max = np.max(sigmas) ** 2.0
 		m = np.linalg.eigvalsh(A).min() + gamma * sigmasqrd_min
 		M = np.linalg.eigvalsh(A).max() + gamma * sigmasqrd_max
-		L = lambda z: f(z[0]) + z[1].T @ (D @ z[0] + g) + gamma / 2 * np.linalg.norm(D @ z[0] + g)**2 + eta/2 * np.linalg.norm(z[1])**2
+		L = lambda z: f(z[0]) + z[1].T @ (D @ z[0] + g) + gamma / 2 * np.linalg.norm(D @ z[0] + g)**2 - eta/2 * np.linalg.norm(z[1])**2
 		dLdx = lambda z: nablaf(z[0]) + D.T @ z[1] + gamma * D.T @ (D @ z[0] + g) 
-		dLdl = lambda z: D @ z[0] + g + eta * z[1]
+		dLdl = lambda z: D @ z[0] + g - eta * z[1]
 	else:
 		raise NotImplementedError
 
@@ -93,8 +94,8 @@ def plot_stats(Fs, max_num_trials):
 
 	fig, ax = plt.subplots()
 	ks_np = np.array(ks)
-	seaborn.violinplot(ks_np, alpha=0.5)
-	ax.set_xticks([0, 1, 2], ['standard', 'augmented', 'regularized'])
+	seaborn.violinplot(data=ks_np, alpha=0.5)
+	ax.set_xticks([0,1,2],['standard', 'augmented', 'regularized'])
 	ax.set_ylabel("num timesteps before convergence")
 
 
@@ -107,7 +108,7 @@ if __name__ == '__main__':
 	epsilon = 0.5
 	Fs = []
 	
-	for trial in range(num_trials):
+	for trial in tqdm.tqdm(range(num_trials)):
 
 		x0 = np.random.randn(dim_state)
 		l0 = np.zeros(dim_constraint)
@@ -125,11 +126,11 @@ if __name__ == '__main__':
 
 		Fs.append((fs_1, fs_2, fs_3))
 
-		if num_trials < 1000:
-			fig, ax = plot_one_experiment(zs_1, fs_1, eq_constraints_1, rho_1, "standard")
-			plot_one_experiment(zs_2, fs_2, eq_constraints_2, rho_2, "augmented", fig, ax)
-			plot_one_experiment(zs_3, fs_3, eq_constraints_3, rho_3, "regularized", fig, ax)
-			ax.legend()
+		# if num_trials < 1000:
+		# 	fig, ax = plot_one_experiment(zs_1, fs_1, eq_constraints_1, rho_1, "standard")
+		# 	plot_one_experiment(zs_2, fs_2, eq_constraints_2, rho_2, "augmented", fig, ax)
+		# 	plot_one_experiment(zs_3, fs_3, eq_constraints_3, rho_3, "regularized", fig, ax)
+		# 	ax.legend()
 
 	if num_trials > 1: 
 		plot_stats(Fs, max_num_iterations)

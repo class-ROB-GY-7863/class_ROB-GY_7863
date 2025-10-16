@@ -35,7 +35,7 @@ def plot_one_experiment(xs, fxs, rho, title):
 def plot_stats(ks):
 	fig, ax = plt.subplots()
 	ks_np = np.array(ks)
-	seaborn.violinplot(ks_np, alpha=0.5)
+	seaborn.violinplot(data=ks_np, alpha=0.5)
 	ax.set_xticks([0, 1], ['contraction', 'classical'])
 	ax.set_ylabel("num timesteps before convergence")
 
@@ -43,7 +43,7 @@ def plot_stats(ks):
 if __name__ == '__main__':
 	num_trials = 100
 	dim = 10
-	epsilon = 0.5
+	epsilon = 0.005
 	ks = []
 	for trial in range(num_trials):
 		x0 = np.random.randn(dim)
