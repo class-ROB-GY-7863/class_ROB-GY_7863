@@ -3,3 +3,5 @@ numpy
 matplotlib
 h5py
 mujoco
+cvxpy
+seaborn
