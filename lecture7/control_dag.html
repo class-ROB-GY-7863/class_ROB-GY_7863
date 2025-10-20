@@ -1,0 +1,155 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 900px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "fixed": false, "id": "Optimal Control", "label": "Optimal Control", "shape": "box", "title": "\u003cb\u003eOptimal Control\u003c/b\u003e", "x": 2115.6, "y": -786.81}, {"color": "#97c2fc", "fixed": false, "id": "Gradient", "label": "Gradient", "shape": "box", "title": "\u003cb\u003eGradient\u003c/b\u003e", "x": 1240.6, "y": -714.81}, {"color": "#97c2fc", "fixed": false, "id": "Search-Based", "label": "Search-Based", "shape": "box", "title": "\u003cb\u003eSearch-Based\u003c/b\u003e", "x": 2223.6, "y": -714.81}, {"color": "#97c2fc", "fixed": false, "id": "Dynamic Programming", "label": "Dynamic Programming", "shape": "box", "title": "\u003cb\u003eDynamic Programming\u003c/b\u003e", "x": 2375.6, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "Tree-Based", "label": "Tree-Based", "shape": "box", "title": "\u003cb\u003eTree-Based\u003c/b\u003e", "x": 2387.6, "y": -630.76}, {"color": "#97c2fc", "fixed": false, "id": "RRT", "label": "RRT", "shape": "box", "title": "\u003cb\u003eRRT\u003c/b\u003e", "x": 2305.6, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "FMT", "label": "FMT", "shape": "box", "title": "\u003cb\u003eFMT\u003c/b\u003e", "x": 2390.6, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "MCTS", "label": "MCTS", "shape": "box", "title": "\u003cb\u003eMCTS\u003c/b\u003e", "x": 2514.6, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "Graph-Based", "label": "Graph-Based", "shape": "box", "title": "\u003cb\u003eGraph-Based\u003c/b\u003e", "x": 2221.6, "y": -630.76}, {"color": "#97c2fc", "fixed": false, "id": "PRM", "label": "PRM", "shape": "box", "title": "\u003cb\u003ePRM\u003c/b\u003e", "x": 2219.6, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "Value Iteration", "label": "Value Iteration", "shape": "box", "title": "\u003cb\u003eValue Iteration\u003c/b\u003e", "x": 2375.6, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Policy Iteration", "label": "Policy Iteration", "shape": "box", "title": "\u003cb\u003ePolicy Iteration\u003c/b\u003e", "x": 2231.6, "y": -90.0}, {"color": "#97c2fc", "fixed": false, "id": "Trajectory: $U$", "label": "Trajectory: $U$", "shape": "box", "title": "\u003cb\u003eTrajectory: $U$\u003c/b\u003e", "x": 1240.6, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "Policy: $\\pi: X \\rightarrow U$", "label": "Policy: $\\pi: X \\rightarrow U$", "shape": "box", "title": "\u003cb\u003ePolicy: $\\pi: X \\rightarrow U$\u003c/b\u003e", "x": 596.62, "y": -630.76}, {"color": "#97c2fc", "fixed": false, "id": "Zero Order: $J(U)$", "label": "Zero Order: $J(U)$", "shape": "box", "title": "\u003cb\u003eZero Order: $J(U)$\u003c/b\u003e", "x": 682.62, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "First Order: $\\partial J / \\partial U$", "label": "First Order: $\\partial J / \\partial U$", "shape": "box", "title": "\u003cb\u003eFirst Order: $\\partial J / \\partial U$\u003c/b\u003e", "x": 1123.6, "y": -246.05}, {"color": "#97c2fc", "fixed": false, "id": "Second Order: $\\partial^2 J / \\partial U^2$", "label": "Second Order: $\\partial^2 J / \\partial U^2$", "shape": "box", "title": "\u003cb\u003eSecond Order: $\\partial^2 J / \\partial U^2$\u003c/b\u003e", "x": 2007.6, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "Affine Equality: $f_i(U)=0$", "label": "Affine Equality: $f_i(U)=0$", "shape": "box", "title": "\u003cb\u003eAffine Equality: $f_i(U)=0$\u003c/b\u003e", "x": 1620.6, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "Convex Inequality: $f_i(U)\u003c0$", "label": "Convex Inequality: $f_i(U)\u003c0$", "shape": "box", "title": "\u003cb\u003eConvex Inequality: $f_i(U)\u003c0$\u003c/b\u003e", "x": 968.62, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "Nonconvex Optimization", "label": "Nonconvex Optimization", "shape": "box", "title": "\u003cb\u003eNonconvex Optimization\u003c/b\u003e", "x": 1321.6, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "Gradient Descent", "label": "Gradient Descent", "shape": "box", "title": "\u003cb\u003eGradient Descent\u003c/b\u003e", "x": 930.62, "y": -90.0}, {"color": "#97c2fc", "fixed": false, "id": "Newton Method", "label": "Newton Method", "shape": "box", "title": "\u003cb\u003eNewton Method\u003c/b\u003e", "x": 2007.6, "y": -90.0}, {"color": "#97c2fc", "fixed": false, "id": "Score Estimation", "label": "Score Estimation", "shape": "box", "title": "\u003cb\u003eScore Estimation\u003c/b\u003e", "x": 811.62, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Sequential Convex Programming", "label": "Sequential Convex Programming", "shape": "box", "title": "\u003cb\u003eSequential Convex Programming\u003c/b\u003e", "x": 1364.6, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Lagrange Multipliers: \n$Z=(U;\\lambda)$", "label": "Lagrange Multipliers: \u003cbr\u003e$Z=(U;\\lambda)$", "shape": "box", "title": "\u003cb\u003eLagrange Multipliers: \u003cbr\u003e$Z=(U;\\lambda)$\u003c/b\u003e", "x": 1683.6, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Barrier Function: \n$J_\u03c1 = J - \u03c1 \\log(-g_i(U))$", "label": "Barrier Function: \u003cbr\u003e$J_\u0026rho; = J - \u0026rho; \\log(-g_i(U))$", "shape": "box", "title": "\u003cb\u003eBarrier Function: \u003cbr\u003e$J_\u0026rho; = J - \u0026rho; \\log(-g_i(U))$\u003c/b\u003e", "x": 1029.6, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Linear Policy: $\\pi(x) = -K x$", "label": "Linear Policy: $\\pi(x) = -K x$", "shape": "box", "title": "\u003cb\u003eLinear Policy: $\\pi(x) = -K x$\u003c/b\u003e", "x": 237.62, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "Linear Dynamics, Quadratic Cost: \n$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$", "label": "Linear Dynamics, Quadratic Cost: \u003cbr\u003e$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$", "shape": "box", "title": "\u003cb\u003eLinear Dynamics, Quadratic Cost: \u003cbr\u003e$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$\u003c/b\u003e", "x": 379.62, "y": -246.05}, {"color": "#97c2fc", "fixed": false, "id": "Linear Quadratic Regulator (DARE)", "label": "Linear Quadratic Regulator (DARE)", "shape": "box", "title": "\u003cb\u003eLinear Quadratic Regulator (DARE)\u003c/b\u003e", "x": 608.62, "y": -162.0}, {"color": "#97c2fc", "fixed": false, "id": "Nonlinear Dynamics, Nonlinear Cost: \n$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$", "label": "Nonlinear Dynamics, Nonlinear Cost: \u003cbr\u003e$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$", "shape": "box", "title": "\u003cb\u003eNonlinear Dynamics, Nonlinear Cost: \u003cbr\u003e$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$\u003c/b\u003e", "x": 283.62, "y": -462.66}, {"color": "#97c2fc", "fixed": false, "id": "First Order: iLQR", "label": "First Order: iLQR", "shape": "box", "title": "\u003cb\u003eFirst Order: iLQR\u003c/b\u003e", "x": 381.62, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Second Order: DDP", "label": "Second Order: DDP", "shape": "box", "title": "\u003cb\u003eSecond Order: DDP\u003c/b\u003e", "x": 155.62, "y": -354.35}, {"color": "#97c2fc", "fixed": false, "id": "Parameterized Policy: $\\pi_\\theta(x)$", "label": "Parameterized Policy: $\\pi_\\theta(x)$", "shape": "box", "title": "\u003cb\u003eParameterized Policy: $\\pi_\\theta(x)$\u003c/b\u003e", "x": 596.62, "y": -546.71}, {"color": "#97c2fc", "fixed": false, "id": "REINFORCE", "label": "REINFORCE", "shape": "box", "title": "\u003cb\u003eREINFORCE\u003c/b\u003e", "x": 813.62, "y": -246.05}, {"color": "#97c2fc", "fixed": false, "id": "PPO", "label": "PPO", "shape": "box", "title": "\u003cb\u003ePPO\u003c/b\u003e", "x": 930.62, "y": -162.0}, {"color": "#97c2fc", "fixed": false, "id": "SAC", "label": "SAC", "shape": "box", "title": "\u003cb\u003eSAC\u003c/b\u003e", "x": 847.62, "y": -162.0}, {"color": "#97c2fc", "fixed": false, "id": "Contraction", "label": "Contraction", "shape": "box", "title": "\u003cb\u003eContraction\u003c/b\u003e", "x": 2007.6, "y": -18.0}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "Optimal Control", "to": "Gradient"}, {"arrows": "to", "from": "Optimal Control", "to": "Search-Based"}, {"arrows": "to", "from": "Optimal Control", "to": "Dynamic Programming"}, {"arrows": "to", "from": "Gradient", "to": "Trajectory: $U$"}, {"arrows": "to", "from": "Gradient", "to": "Policy: $\\pi: X \\rightarrow U$"}, {"arrows": "to", "from": "Search-Based", "to": "Tree-Based"}, {"arrows": "to", "from": "Search-Based", "to": "Graph-Based"}, {"arrows": "to", "from": "Dynamic Programming", "to": "Value Iteration"}, {"arrows": "to", "from": "Dynamic Programming", "to": "Policy Iteration"}, {"arrows": "to", "from": "Tree-Based", "to": "RRT"}, {"arrows": "to", "from": "Tree-Based", "to": "FMT"}, {"arrows": "to", "from": "Tree-Based", "to": "MCTS"}, {"arrows": "to", "from": "FMT", "to": "Dynamic Programming"}, {"arrows": "to", "from": "MCTS", "to": "Value Iteration"}, {"arrows": "to", "from": "Graph-Based", "to": "PRM"}, {"arrows": "to", "from": "Value Iteration", "to": "Contraction"}, {"arrows": "to", "from": "Policy Iteration", "to": "Contraction"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "Zero Order: $J(U)$"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "First Order: $\\partial J / \\partial U$"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "Second Order: $\\partial^2 J / \\partial U^2$"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "Affine Equality: $f_i(U)=0$"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "Convex Inequality: $f_i(U)\u003c0$"}, {"arrows": "to", "from": "Trajectory: $U$", "to": "Nonconvex Optimization"}, {"arrows": "to", "from": "Policy: $\\pi: X \\rightarrow U$", "to": "Linear Policy: $\\pi(x) = -K x$"}, {"arrows": "to", "from": "Policy: $\\pi: X \\rightarrow U$", "to": "Parameterized Policy: $\\pi_\\theta(x)$"}, {"arrows": "to", "from": "Zero Order: $J(U)$", "to": "Score Estimation"}, {"arrows": "to", "from": "First Order: $\\partial J / \\partial U$", "to": "Gradient Descent"}, {"arrows": "to", "from": "Second Order: $\\partial^2 J / \\partial U^2$", "to": "Newton Method"}, {"arrows": "to", "from": "Affine Equality: $f_i(U)=0$", "to": "Lagrange Multipliers: \n$Z=(U;\\lambda)$"}, {"arrows": "to", "from": "Convex Inequality: $f_i(U)\u003c0$", "to": "Barrier Function: \n$J_\u03c1 = J - \u03c1 \\log(-g_i(U))$"}, {"arrows": "to", "from": "Nonconvex Optimization", "to": "Sequential Convex Programming"}, {"arrows": "to", "from": "Gradient Descent", "to": "Contraction"}, {"arrows": "to", "from": "Newton Method", "to": "Contraction"}, {"arrows": "to", "from": "Score Estimation", "to": "First Order: $\\partial J / \\partial U$"}, {"arrows": "to", "from": "Score Estimation", "to": "REINFORCE"}, {"arrows": "to", "from": "Sequential Convex Programming", "to": "First Order: $\\partial J / \\partial U$"}, {"arrows": "to", "from": "Lagrange Multipliers: \n$Z=(U;\\lambda)$", "to": "First Order: $\\partial J / \\partial U$"}, {"arrows": "to", "from": "Barrier Function: \n$J_\u03c1 = J - \u03c1 \\log(-g_i(U))$", "to": "First Order: $\\partial J / \\partial U$"}, {"arrows": "to", "from": "Linear Policy: $\\pi(x) = -K x$", "to": "Linear Dynamics, Quadratic Cost: \n$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$"}, {"arrows": "to", "from": "Linear Policy: $\\pi(x) = -K x$", "to": "Nonlinear Dynamics, Nonlinear Cost: \n$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$"}, {"arrows": "to", "from": "Linear Dynamics, Quadratic Cost: \n$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$", "to": "Linear Quadratic Regulator (DARE)"}, {"arrows": "to", "from": "Linear Quadratic Regulator (DARE)", "to": "Gradient Descent"}, {"arrows": "to", "from": "Linear Quadratic Regulator (DARE)", "to": "Contraction"}, {"arrows": "to", "from": "Nonlinear Dynamics, Nonlinear Cost: \n$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$", "to": "First Order: iLQR"}, {"arrows": "to", "from": "Nonlinear Dynamics, Nonlinear Cost: \n$x_{k+1} = f(x_k, u_k)$, $c_k = g(x_k, u_k)$", "to": "Second Order: DDP"}, {"arrows": "to", "from": "First Order: iLQR", "to": "Linear Dynamics, Quadratic Cost: \n$x_{k+1} = A x_k + B u_k$, $c_k = x_k^T Q x_k + u_k^T R u_k$"}, {"arrows": "to", "from": "Parameterized Policy: $\\pi_\\theta(x)$", "to": "REINFORCE"}, {"arrows": "to", "from": "REINFORCE", "to": "PPO"}, {"arrows": "to", "from": "REINFORCE", "to": "SAC"}, {"arrows": "to", "from": "REINFORCE", "to": "Score Estimation"}, {"arrows": "to", "from": "PPO", "to": "Gradient Descent"}, {"arrows": "to", "from": "SAC", "to": "Gradient Descent"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": false,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
