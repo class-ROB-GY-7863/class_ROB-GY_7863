@@ -9,18 +9,6 @@ class Controller:
         # return u in [m,1]
         raise NotImplementedError
 
-class RandomController(Controller):
-    def __call__(self, x, rng, system, scale=1.0):
-        u = rng.normal(loc=0.0, scale=scale, size=(self.m, 1))
-        return u
-
-class FeedbackController(Controller):
-    def __call__(self, x, rng, system, scale=1.0):
-        K = np.diag(np.ones(max(system.m(), system.n())))
-        K = K[0:system.m(),0:system.n()]
-        u = - K @ x
-        return u
-
 class EmptyController(Controller):
     def __call__(self, x, rng, system, scale=1.0):
         u = np.zeros((system.m, 1))
@@ -32,3 +20,7 @@ class LQRController(Controller):
         K = np.linalg.inv(system.Q_u + system.B.T @ P @ system.B) @ (system.B.T @ P @ system.A)
         u = -K @ x
         return u
+
+class MPPI(Controller):
+    def __call__(self, x, rng, system):
+        raise NotImplementedError

@@ -16,24 +16,30 @@ def simulate(p, rng):
     # system
     if system_name == "LTI_1":
         system = LTI_1
+    elif system_name == "LTI_2":
+        system = LTI_2
+    elif system_name == "MJXPendulum":
+        system = MJXPendulum
     else:
         raise ValueError(f"Unsupported system: {system_name}")
 
     # estimator
-    if estimator_name == "KalmanFilter":
+    if estimator_name == "EmptyEstimator":
+        estimator = EmptyEstimator()
+    elif estimator_name == "KalmanFilter":
         estimator = KalmanFilter()
+    elif estimator_name == "EnsembleKalmanFilter":
+        estimator = EnsembleKalmanFilter()
     else:
         raise ValueError(f"Unsupported estimator: {estimator_name}")
 
     # controller
-    if controller_name == "RandomController":
-        controller = RandomController()
-    elif controller_name == "FeedbackController":
-        controller = FeedbackController()
-    elif controller_name == "EmptyController":
+    if controller_name == "EmptyController":
         controller = EmptyController()
     elif controller_name == "LQRController":
         controller = LQRController()
+    elif controller_name == "MPPI":
+        controller = MPPI()
     else:
         raise ValueError(f"Unsupported controller: {controller_name}")
 
@@ -45,7 +51,7 @@ def simulate(p, rng):
 
     # loop 
     for _ in range(num_timesteps):
-        u_kp1 = controller(xs[-1], rng, system)
+        u_kp1 = controller(xhats[-1], rng, system)
         x_kp1 = system.dynamics(xs[-1], u_kp1, rng)
         y_kp1 = system.measurement(x_kp1, rng)
         xhat_kp1, P_kp1 = estimator.estimate(xhats[-1], Ps[-1], u_kp1, y_kp1, system)
@@ -122,7 +128,7 @@ if __name__ == "__main__":
 
     p = {
         "num_timesteps": 100,
-        "system_name": "LTI_1",
+        "system_name": "LTI_2",
         "estimator_name": "KalmanFilter",
         "controller_name": "LQRController",
         "data_fn": "./estimator_data.npz",
